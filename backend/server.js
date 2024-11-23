@@ -5,13 +5,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// Пример хранения пользователей (можно заменить на базу данных)
+// Пример хранения пользователей в памяти (не используем базу данных)
 const users = [];
 
 // Секретный ключ для токенов
@@ -29,7 +29,7 @@ app.post('/register', async (req, res) => {
   // Хэширование пароля
   const hashedPassword = await bcrypt.hash(password, 10);
   users.push({ username, password: hashedPassword });
-  res.json({ message: 'User registered successfully' });
+  res.json({ message: 'Registration successful' });
 });
 
 // Роут для логина
@@ -50,20 +50,7 @@ app.post('/login', async (req, res) => {
 
   // Генерация токена
   const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-  res.json({ token });
-});
-
-// Проверка токена
-app.get('/protected', (req, res) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(401).json({ message: 'Access denied' });
-
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    res.json({ message: `Hello, ${decoded.username}` });
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
+  res.json({ message: 'Welcome back', token });
 });
 
 // Запуск сервера
